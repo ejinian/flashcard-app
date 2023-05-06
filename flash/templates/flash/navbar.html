@@ -1,0 +1,22 @@
+<nav class="navbar navbar-expand-md navbar-light" style="background-color: #e6e6e6;">
+    <a class="navbar-brand" href="{% url 'flash-card-home' %}">Flashcard Home</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-3="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'flash-card-home' %}">Home</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'hard-to-remember' %}">Hard To Remember</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'card-admin' %}">Create Flashcards</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'admin-tool' %}">Refresh Cards</a>
+        </li>
+        </ul>
+    </div>
+</nav>

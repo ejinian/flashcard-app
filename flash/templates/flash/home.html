@@ -1,0 +1,115 @@
+{% extends 'flash/base.html' %}
+{% block content %}
+    {% csrf_token %}
+    <h1 class="invis">You have no more words to review; you are permanently done!</h1>
+    <div id="r1" class="d-flex justify-content-center align-items-center" style="height: 40vh;">
+        <div class="card d-flex justify-content-center align-items-center">
+            <div class="card-inner " style="align-items:center">
+                <div class="card-front">
+                    <p>Word</p>
+                    <h1 id="question">Question</h1>
+                </div>
+                <div class="card-back">
+                    <p>Definition</p>
+                    <h1 id="answer">Answer</h1>
+                </div>
+            </div>
+            <button class="btn btn-primary mb-2" style="text-align:center;max-width:200px;">Show definition</button>
+        </div>
+    </div>
+    <div id="r2" class="d-flex justify-content-center align-items-center" style="display:inline-block;">
+        <div id="showbtns">
+            <button class="btn btn-danger" onClick="handleNext(false);">Wrong</button> &nbsp;
+            <button class="btn btn-primary" onClick="handleNext(true);">Right</button>
+        </div>
+        <p id="time" style="text-align:center;">null</p> &nbsp; &nbsp;
+        <p id="cooldown" style="text-align:center;">null</p>
+    </div>
+
+
+    <script>
+        let timespan = [0, 5, 25, 120, 600, 3600, 18000, 86400, 432000, 2160000, 10520000, -1];
+        var flashcards = JSON.parse('{{ flashcards_json|safe }}');
+        var index = 0;
+
+        function done(){
+            let showDone = document.getElementsByClassName('invis')[0];
+            showDone.style.display = 'block';
+            let showCard = document.getElementById('r1');
+            showCard.style.visibility = 'hidden';
+            let showBtns = document.getElementById('r2');
+            showBtns.style.visibility = 'hidden';
+            return;
+        }
+
+        function handleNext(correct) {
+            if (flashcards === undefined){
+                done();
+                return;
+            }
+            console.log("index: " + index)
+            var c = flashcards[index].fields;
+            console.log(c);
+            $.ajax({
+                type: 'POST',
+                url: '{% url 'flash-card-home' %}',
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    id: flashcards[index].pk,
+                    correct: correct,
+                    time_cooldown: c.time_cooldown,
+                },
+                success: function(response) {
+
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+            if (correct === true) {
+                let newIndex = timespan.indexOf(c.time_cooldown) + 1;
+                if (newIndex >= timespan.length) {
+                    newIndex = timespan.length - 1;
+                }
+                flashcards[index].fields.time_cooldown = timespan[newIndex];
+            } else {
+                flashcards[index].fields.time_cooldown = 5;
+            }
+
+            //index++;
+            //if (index >= flashcards.length) {
+            //    index = 0;
+            //}
+            // we are incrementing the index because we want to show the next card
+            // it would be better to auto sort the flashcards by time_cooldown each time
+            console.log(flashcards);
+            flashcards.sort(function(a, b) {
+                return a.fields.time_cooldown - b.fields.time_cooldown;
+            });
+            // set index to the first card with the lowest time_cooldown
+            index = 0;
+            renderFlashcard();
+        }
+        
+        function renderFlashcard() {
+            if (flashcards[index] === undefined){
+                done();
+                return;
+            }
+            var c = flashcards[index].fields;
+            $('#question').text(c.question);
+            $('#answer').text(c.answer);
+            $('#time').text(c.updated_at);
+            $('#cooldown').text(c.time_cooldown);
+        }
+        
+        $(document).ready(function() {
+            renderFlashcard();
+            $('#showbtns').show();
+            $('.card').click(function() {
+                //$('#showbtns').fadeToggle();
+                $(this).toggleClass('card-flipped');
+            });
+        });
+    </script>
+{% endblock %}
