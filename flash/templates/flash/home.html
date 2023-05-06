@@ -75,18 +75,13 @@
             } else {
                 flashcards[index].fields.time_cooldown = 5;
             }
-
-            //index++;
-            //if (index >= flashcards.length) {
-            //    index = 0;
-            //}
             // we are incrementing the index because we want to show the next card
             // it would be better to auto sort the flashcards by time_cooldown each time
             console.log(flashcards);
             flashcards.sort(function(a, b) {
                 return a.fields.time_cooldown - b.fields.time_cooldown;
             });
-            // set index to the first card with the lowest time_cooldown
+
             index = 0;
             renderFlashcard();
         }
