@@ -17,13 +17,13 @@
             <button class="btn btn-primary mb-2" style="text-align:center;max-width:200px;">Show definition</button>
         </div>
     </div>
-    <div id="r2" class="d-flex justify-content-center align-items-center" style="display:inline-block;">
-        <div id="showbtns">
-            <button class="btn btn-danger" onClick="handleNext(false);">Wrong</button> &nbsp;
-            <button class="btn btn-primary" onClick="handleNext(true);">Right</button>
+    <div id="r2" class="container-c">
+        <div id="showbtns" class="center">
+            <button class="btn btn-danger" onClick="handleNext(false);">I did not get it</button> &nbsp;
+            <button class="btn btn-primary" onClick="handleNext(true);">I got it</button>
+            <p id="time" style="text-align:center">null</p>
+            <p id="cooldown" style="text-align:center">null</p>
         </div>
-        <p id="time" style="text-align:center;">null</p> &nbsp; &nbsp;
-        <p id="cooldown" style="text-align:center;">null</p>
     </div>
 
 
@@ -114,7 +114,9 @@
                 flashcards[index].fields.current_bin = nextBin;
                 console.log("card id " + flashcards[index].pk + " new bin " + nextBin);
             } else {
+                console.log("answered incorrectly")
                 flashcards[index].fields.time_cooldown = 5;
+                flashcards[index].fields.current_bin = "bin1";
             }
             flashcards.sort(function(a, b) {
                 return a.fields.time_cooldown - b.fields.time_cooldown;
@@ -122,7 +124,6 @@
 
             index = 0;
             let timeOut = flashcards[index].fields.time_cooldown;
-            console.log("timeOut: " + timeOut);
             setTimeout(function() {
                 isTimerRunning = false;
                 renderFlashcard();

@@ -35,6 +35,7 @@ def home(request):
         else:
             flashcard.hard_to_remember += 1
             flashcard.time_cooldown = 5
+            flashcard.current_bin = 'bin1'
         flashcard.save()
         print(f'Flashcard_id: {flashcard_id}' + f' Has new cooldown: {flashcard.time_cooldown}')
         sendBack = {
@@ -62,13 +63,51 @@ def hard_to_remember(request):
     return render(request, 'flash/hard_to_remember.html', context)
 
 def card_admin(request):
-    return render(request, 'flash/card_admin.html')
+    # read
+    flashcards = Flashcard.objects.filter(user_id=request.user)
+    context = {
+        'flashcards': flashcards
+    }
+    return render(request, 'flash/card_admin.html', context)
+
+def card_admin_create(request):
+    # create
+    if request.method == 'POST':
+        question = request.POST['question']
+        answer = request.POST['answer']
+        flashcard = Flashcard(question=question, answer=answer, user_id=request.user)
+        flashcard.save()
+        return JsonResponse({'flashcard_id': flashcard.id})
+    return JsonResponse({'flashcard_id': -1})
+
+def card_admin_delete(request):
+    # delete
+    if request.method == 'POST':
+        flashcard_id = request.POST['flashcard_id']
+        flashcard = Flashcard.objects.get(id=flashcard_id)
+        flashcard.delete()
+        return JsonResponse({'flashcard_id': flashcard_id})
+    return JsonResponse({'flashcard_id': -1})
+
+def card_admin_update(request):
+    # update
+    if request.method == 'POST':
+        flashcard_id = request.POST['flashcard_id']
+        question = request.POST['question']
+        answer = request.POST['answer']
+        flashcard = Flashcard.objects.get(id=flashcard_id)
+        flashcard.question = question
+        flashcard.answer = answer
+        flashcard.save()
+        return JsonResponse({'flashcard_id': flashcard_id})
+    return JsonResponse({'flashcard_id': -1})
 
 def admin_tool(request):
     all_flashcards = Flashcard.objects.all()
     for x in all_flashcards:
         x.time_cooldown = 0
         x.hard_to_remember = 0
+        x.current_bin = 'bin0'
         x.save()
     flashcards_json = serializers.serialize('json', all_flashcards)
     return render(request, 'flash/home.html', {'flashcards_json': flashcards_json})
