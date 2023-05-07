@@ -4,11 +4,11 @@
     <form>
         <h1>Edit Flashcard</h1>
         <div class="form-group">
-            <label for="question">Old Question: {{flashcard.question}}</label>
+            <label for="question">Update Word</label>
             <input type="text" class="form-control" id="question" placeholder="Enter new question" value="{{flashcard.question}}">
         </div>
         <div class="form-group">
-            <label for="answer">Old Answer: {{flashcard.answer}} </label>
+            <label for="answer">Update Definition</label>
             <input type="text" class="form-control" id="answer" placeholder="Enter new answer" value="{{flashcard.answer}}">
         </div>
         <div class="container-c">
@@ -20,6 +20,10 @@
     <script>
         function update(){
             console.log("Updating card with question: " + $('#question').val() + " and answer: " + $('#answer').val())
+            if ($('#question').val() == "" || $('#answer').val() == ""){
+                alert("Please fill out both fields");
+                return;
+            }
             $.ajax({
                 type: "POST",
                 url: '{% url 'card-admin-update' 0 %}'.replace('0', '{{flashcard.id}}'),

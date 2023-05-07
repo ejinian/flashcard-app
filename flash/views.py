@@ -4,20 +4,20 @@ from django.core import serializers
 from django.http import JsonResponse
 from datetime import datetime, timezone
 
-
+timespan_old = [0, 5, 25, 120, 600, 3600, 18000, 86400, 432000, 2160000, 10520000, -1]
 timespan = {
-    'bin0': 0,
-    'bin1': 2,
-    'bin2': 3,
-    'bin3': 4,
-    'bin4': 5,
-    'bin5': 3600,
-    'bin6': 18000,
-    'bin7': 86400,
-    'bin8': 432000,
-    'bin9': 2160000,
-    'bin10': 10520000,
-    'bin11': -1,
+    '0': 0,
+    '1': 1,
+    '2': 1,
+    '3': 1,
+    '4': 1,
+    '5': 1,
+    '6': 1,
+    '7': 1,
+    '8': 1,
+    '9': 1,
+    '10': 1,
+    '11': 99999999,
 }
 
 def updateTimes(user):
@@ -46,15 +46,15 @@ def home(request):
         current_bin = request.POST['current_bin']
         flashcard = Flashcard.objects.get(id=flashcard_id)
         if correct == 'true':
-            nextBin = 'bin' + str(int(current_bin[-1]) + 1)
+            nextBin = str(int(current_bin) + 1)
+            if flashcard.current_bin == '11':
+                nextBin = '11'
             flashcard.time_cooldown = timespan[nextBin]
             flashcard.current_bin = nextBin
-            if flashcard.time_cooldown == -1:
-                flashcard.current_bin = 'bin11'
         else:
             flashcard.hard_to_remember += 1
-            flashcard.time_cooldown = 5
-            flashcard.current_bin = 'bin1'
+            flashcard.time_cooldown = 1
+            flashcard.current_bin = '1'
         flashcard.last_bin_change = datetime.now(timezone.utc)
         flashcard.save()
         print(f'Flashcard_id: {flashcard_id}' + f' Has new cooldown: {flashcard.time_cooldown}')
@@ -67,7 +67,7 @@ def home(request):
         return JsonResponse(sendBack)
     
     flashcards = Flashcard.objects.filter(user_id=request.user)\
-        .exclude(time_cooldown=-1).exclude(hard_to_remember=10).order_by('time_cooldown')
+        .exclude(current_bin='11').exclude(hard_to_remember=10).order_by('time_cooldown')
     flashcards_json = serializers.serialize('json', flashcards)
     context = {
         'flashcards_json': flashcards_json
@@ -126,10 +126,7 @@ def card_admin_update(request, pk):
         flashcard.save()
         return render(request, 'flash/card_admin.html', {'flashcards': flashcards})
     else:
-        context = {
-            'flashcard': flashcard
-        }
-        return render(request, 'flash/card_admin_update.html', context)
+        return render(request, 'flash/card_admin_update.html', {'flashcard': flashcard})
 
 def admin_tool(request):
     # nice tool to clear all cooldowns and hard_to_remember values
@@ -138,7 +135,7 @@ def admin_tool(request):
     for x in all_flashcards:
         x.time_cooldown = 0
         x.hard_to_remember = 0
-        x.current_bin = 'bin0'
+        x.current_bin = '0'
         x.save()
     flashcards_json = serializers.serialize('json', all_flashcards)
     return render(request, 'flash/home.html', {'flashcards_json': flashcards_json})

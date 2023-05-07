@@ -18,18 +18,26 @@
             </div>
         </form>
     </div><br><br>
-    <div style="text-align: center;">
+    {% if flashcards|length > 0%}
+    <div style="text-align:center;" class="mt-3 mb-3">
+        <button class="btn btn-primary" onClick="location.href='{% url 'flash-card-home' %}'">Start Studying</button>
+    </div>
+    {% endif%}
+    <div style="text-align: center;">        
         {% for card in flashcards %}
             <div style="display: inline-block !important;">
                 <div class="card d-flex justify-content-center align-items-center">
                     <div class="card-inner " style="align-items:center">
                         <div class="card-front">
+                            <p>Question</p>
                             <h1 id="question">{{ card.question}}</h1>
                         </div>
                         <div class="card-back">
+                            <p>Definition</p>
                             <h1 id="answer">{{ card.answer }}</h1>
                         </div>
                     </div>
+                    <p>Current Bin: {{card.current_bin}}</p>
                     <p>Cooldown: {{ card.time_cooldown }}</p>
                     <p>Answered Incorrectly: {{ card.hard_to_remember }}</p>
                     <button class="btn btn-primary mb-2" style="text-align:center;max-width:200px;">Show definition</button>

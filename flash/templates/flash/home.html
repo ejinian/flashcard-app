@@ -26,19 +26,20 @@
 
 
     <script>
+        // hashmap to map bin to timespan in seconds
         let timespan = {
-            'bin0': 0,
-            'bin1': 2,
-            'bin2': 3,
-            'bin3': 4,
-            'bin4': 5,
-            'bin5': 3600,
-            'bin6': 18000,
-            'bin7': 86400,
-            'bin8': 432000,
-            'bin9': 2160000,
-            'bin10': 10520000,
-            'bin11': -1,
+            '0': 0,
+            '1': 1,
+            '2': 1,
+            '3': 1,
+            '4': 1,
+            '5': 1,
+            '6': 1,
+            '7': 1,
+            '8': 1,
+            '9': 1,
+            '10': 1,
+            '11': 99999999,
         }
         var flashcards = JSON.parse('{{ flashcards_json|safe }}');
         var index = 0;
@@ -65,6 +66,8 @@
         }
 
         function startTimer() {
+            // dynamically decrement cooldowns every second for each flashcard
+            // not the quickest solution but it allows for the cooldowns to be updated without refreshing the page
             setInterval(() => {
                 for (let i = 0; i < flashcards.length; i++) {
                     const card = flashcards[i];
@@ -81,7 +84,6 @@
                 done();
                 return;
             }
-            console.log("index: " + index)
             var c = flashcards[index].fields;
             console.log(c);
             $.ajax({
@@ -101,21 +103,33 @@
                     console.log(error);
                 }
             });
+            
+            // this is where we handle the card's bin logic upon answering right or wrong
             if (correct === true) {
-                if (c.time_cooldown === -1){
-                    console.log("reached end for card id " + flashcards[index].pk + " bin " + c.current_bin)
-                    return;
+                let nextBinIndex = parseInt(c.current_bin) + 1;
+                let nextBin = nextBinIndex.toString();
+                if (timespan[nextBin] === undefined) {
+                    nextBin = c.current_bin;
                 }
-                let nextBinIndex = parseInt(c.current_bin.substring(3)) + 1;
-                let nextBin = "bin" + nextBinIndex;
+                if (nextBin === "11"){
+                    // checking to exclude a card from being rendered if it is in the last bin
+                    location.reload();
+                }
                 flashcards[index].fields.time_cooldown = timespan[nextBin];
                 flashcards[index].fields.current_bin = nextBin;
                 console.log("card id " + flashcards[index].pk + " new bin " + nextBin);
             } else {
                 console.log("answered incorrectly")
-                flashcards[index].fields.time_cooldown = 5;
-                flashcards[index].fields.current_bin = "bin1";
+                c.hard_to_remember++;
+                if (c.hard_to_remember === 10){
+                    location.reload();
+                }
+                flashcards[index].fields.time_cooldown = 1;
+                flashcards[index].fields.current_bin = "1";
             }
+
+            // sorting here allows for the lowest cooldown card to be rendered
+            // like a makeshift priority queue
             flashcards.sort(function(a, b) {
                 return a.fields.time_cooldown - b.fields.time_cooldown;
             });
@@ -135,15 +149,21 @@
                 done();
                 return;
             }
-            let showDone = document.getElementsByClassName('invis')[0];
-            showDone.style.display = 'none';
-            let showCard = document.getElementById('r1');
-            showCard.style.visibility = 'visible';
-            let showBtns = document.getElementById('r2');
-            showBtns.style.visibility = 'visible';
-            var c = flashcards[index].fields;
-            $('#question').text(c.question);
-            $('#answer').text(c.answer);
+            // at this point, we are only rendering the lowest cooldown card, or the temporary message if that card also has a cooldown
+            console.log(flashcards[index].fields)
+            if (flashcards[index].fields.time_cooldown > 0) {
+                showTemporaryMessage("You are temporarily done; please come back later to review more words.")
+            }else{
+                let showDone = document.getElementsByClassName('invis')[0];
+                showDone.style.display = 'none';
+                let showCard = document.getElementById('r1');
+                showCard.style.visibility = 'visible';
+                let showBtns = document.getElementById('r2');
+                showBtns.style.visibility = 'visible';
+                var c = flashcards[index].fields;
+                $('#question').text(c.question);
+                $('#answer').text(c.answer);
+            }
         }
         
         $(document).ready(function() {
