@@ -20,6 +20,8 @@ timespan = {
 
 
 def home(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
     if request.method == 'POST':
         flashcard_id = request.POST['id']
         correct = request.POST['correct']
@@ -55,6 +57,8 @@ def home(request):
     return render(request, 'flash/home.html', context)
 
 def hard_to_remember(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
     # get all flashcards that have a hard_to_remember value of 10
     flashcards = Flashcard.objects.filter(user_id=request.user, hard_to_remember=10)
     context = {
@@ -64,6 +68,8 @@ def hard_to_remember(request):
 
 def card_admin(request):
     # read
+    if not request.user.is_authenticated:
+        return redirect('login')
     flashcards = Flashcard.objects.filter(user_id=request.user)
     context = {
         'flashcards': flashcards

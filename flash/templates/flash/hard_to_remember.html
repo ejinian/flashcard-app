@@ -1,6 +1,5 @@
 {% extends 'flash/base.html' %}
 {% block content %}
-    {% comment %} iterate through flashcards_json {% endcomment %}
     {% if flashcards_json|length == 0 %}
         <h1>No flashcards here yet</h1>
     {% endif %}

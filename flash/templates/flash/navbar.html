@@ -4,19 +4,30 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'hard-to-remember' %}">Hard To Remember</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'card-admin' %}">Create Flashcards</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'admin-tool' %}">Refresh Cards</a>
+            </li>
+        </ul>
         <ul class="navbar-nav ml-auto">
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'flash-card-home' %}">Home</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'hard-to-remember' %}">Hard To Remember</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'card-admin' %}">Create Flashcards</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'admin-tool' %}">Refresh Cards</a>
-        </li>
+            {% if request.user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'register' %}">Register</a>
+                </li>
+            {% endif %}
         </ul>
     </div>
 </nav>
