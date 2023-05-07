@@ -28,7 +28,20 @@
 
 
     <script>
-        let timespan = [0, 2, 3, 4, 5, 3600, 18000, 86400, 432000, 2160000, 10520000, -1];
+        let timespan = {
+            'bin0': 0,
+            'bin1': 2,
+            'bin2': 3,
+            'bin3': 4,
+            'bin4': 5,
+            'bin5': 3600,
+            'bin6': 18000,
+            'bin7': 86400,
+            'bin8': 432000,
+            'bin9': 2160000,
+            'bin10': 10520000,
+            'bin11': -1,
+        }
         var flashcards = JSON.parse('{{ flashcards_json|safe }}');
         var index = 0;
         startTimer();
@@ -58,7 +71,7 @@
                 for (let i = 0; i < flashcards.length; i++) {
                     const card = flashcards[i];
                     if (card.fields.time_cooldown > 0) {
-                        console.log("Decrementing cooldown for card " + card.pk)
+                        console.log("Decrementing cooldown for card " + card.pk + " seconds: " + card.fields.time_cooldown)
                         card.fields.time_cooldown--;
                     }
                 }
@@ -81,6 +94,7 @@
                     id: flashcards[index].pk,
                     correct: correct,
                     time_cooldown: c.time_cooldown,
+                    current_bin: c.current_bin,
                 },
                 success: function(response) {
 
@@ -90,11 +104,15 @@
                 }
             });
             if (correct === true) {
-                let newIndex = timespan.indexOf(c.time_cooldown) + 1;
-                if (newIndex >= timespan.length) {
-                    newIndex = timespan.length - 1;
+                if (c.time_cooldown === -1){
+                    console.log("reached end for card id " + flashcards[index].pk + " bin " + c.current_bin)
+                    return;
                 }
-                flashcards[index].fields.time_cooldown = timespan[newIndex];
+                let nextBinIndex = parseInt(c.current_bin.substring(3)) + 1;
+                let nextBin = "bin" + nextBinIndex;
+                flashcards[index].fields.time_cooldown = timespan[nextBin];
+                flashcards[index].fields.current_bin = nextBin;
+                console.log("card id " + flashcards[index].pk + " new bin " + nextBin);
             } else {
                 flashcards[index].fields.time_cooldown = 5;
             }

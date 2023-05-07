@@ -7,5 +7,6 @@ class Flashcard(models.Model):
     answer = models.CharField(max_length=200)
     hard_to_remember = models.IntegerField(default=0)
     time_cooldown = models.IntegerField(default=0)
+    current_bin = models.CharField(max_length=200, default='bin0')
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     updated_at = models.DateTimeField(auto_now=True)

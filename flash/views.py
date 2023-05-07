@@ -3,7 +3,20 @@ from .models import Flashcard
 from django.core import serializers
 from django.http import JsonResponse
 
-timespan = [0, 2, 3, 4, 5, 3600, 18000, 86400, 432000, 2160000, 10520000, -1]
+timespan = {
+    'bin0': 0,
+    'bin1': 2,
+    'bin2': 3,
+    'bin3': 4,
+    'bin4': 5,
+    'bin5': 3600,
+    'bin6': 18000,
+    'bin7': 86400,
+    'bin8': 432000,
+    'bin9': 2160000,
+    'bin10': 10520000,
+    'bin11': -1,
+}
 
 
 def home(request):
@@ -11,12 +24,14 @@ def home(request):
         flashcard_id = request.POST['id']
         correct = request.POST['correct']
         time_cooldown = request.POST['time_cooldown']
+        current_bin = request.POST['current_bin']
         flashcard = Flashcard.objects.get(id=flashcard_id)
         if correct == 'true':
-            index = timespan.index(int(time_cooldown))
-            print("Index of timespan array: " + f'{index}')
-            if index < len(timespan) - 1:
-                flashcard.time_cooldown = timespan[index + 1]
+            nextBin = 'bin' + str(int(current_bin[-1]) + 1)
+            flashcard.time_cooldown = timespan[nextBin]
+            flashcard.current_bin = nextBin
+            if flashcard.time_cooldown == -1:
+                flashcard.current_bin = 'bin11'
         else:
             flashcard.hard_to_remember += 1
             flashcard.time_cooldown = 5
