@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from .models import Flashcard
 from django.core import serializers
 from django.http import JsonResponse
+from datetime import datetime, timezone
+
 
 timespan = {
     'bin0': 0,
@@ -18,10 +20,25 @@ timespan = {
     'bin11': -1,
 }
 
+def updateTimes(user):
+    flashcards = Flashcard.objects.filter(user_id=user)
+    current_time = datetime.now(timezone.utc)
+    print(f'Current time: {current_time}')
+    for flashcard in flashcards:
+        time_passed = current_time - flashcard.last_bin_change
+        print('time_passed: ' + str(time_passed))
+        cooldown_in_seconds = timespan[flashcard.current_bin] - time_passed.total_seconds()
+        if cooldown_in_seconds < 0:
+            cooldown_in_seconds = 0
+        flashcard.time_cooldown = cooldown_in_seconds
+        flashcard.save()
+    return
+
 
 def home(request):
     if not request.user.is_authenticated:
         return redirect('login')
+    updateTimes(request.user)
     if request.method == 'POST':
         flashcard_id = request.POST['id']
         correct = request.POST['correct']
@@ -38,6 +55,7 @@ def home(request):
             flashcard.hard_to_remember += 1
             flashcard.time_cooldown = 5
             flashcard.current_bin = 'bin1'
+        flashcard.last_bin_change = datetime.now(timezone.utc)
         flashcard.save()
         print(f'Flashcard_id: {flashcard_id}' + f' Has new cooldown: {flashcard.time_cooldown}')
         sendBack = {
@@ -70,6 +88,7 @@ def card_admin(request):
     # read
     if not request.user.is_authenticated:
         return redirect('login')
+    updateTimes(request.user)
     flashcards = Flashcard.objects.filter(user_id=request.user)
     context = {
         'flashcards': flashcards
@@ -113,7 +132,8 @@ def card_admin_update(request, pk):
         return render(request, 'flash/card_admin_update.html', context)
 
 def admin_tool(request):
-    # tool to clear all cooldowns and hard_to_remember values
+    # nice tool to clear all cooldowns and hard_to_remember values
+    # -------not needed in production-------
     all_flashcards = Flashcard.objects.all()
     for x in all_flashcards:
         x.time_cooldown = 0

@@ -30,6 +30,8 @@
                             <h1 id="answer">{{ card.answer }}</h1>
                         </div>
                     </div>
+                    <p>Cooldown: {{ card.time_cooldown }}</p>
+                    <p>Answered Incorrectly: {{ card.hard_to_remember }}</p>
                     <button class="btn btn-primary mb-2" style="text-align:center;max-width:200px;">Show definition</button>
                 </div>
                 <button class="btn btn-success mt-2 mb-2" onClick="update({{card.pk}});" style="text-align:center;max-width:200px;">Update</button>
@@ -44,7 +46,6 @@
             });
         });
         function del(pk){
-            console.log("Deleting card with id: " + pk)
             $.ajax({
                 type: "POST",
                 url: '{% url 'card-admin-delete' %}',
@@ -62,7 +63,6 @@
                 alert("Please fill out both fields");
                 return;
             }
-            console.log("Creating card with question: " + $('#question').val() + " and answer: " + $('#answer').val())
             $.ajax({
                 type: "POST",
                 url: '{% url 'card-admin-create' %}',

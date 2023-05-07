@@ -21,8 +21,6 @@
         <div id="showbtns" class="center">
             <button class="btn btn-danger" onClick="handleNext(false);">I did not get it</button> &nbsp;
             <button class="btn btn-primary" onClick="handleNext(true);">I got it</button>
-            <p id="time" style="text-align:center">null</p>
-            <p id="cooldown" style="text-align:center">null</p>
         </div>
     </div>
 
@@ -146,8 +144,6 @@
             var c = flashcards[index].fields;
             $('#question').text(c.question);
             $('#answer').text(c.answer);
-            $('#time').text(c.updated_at);
-            $('#cooldown').text(c.time_cooldown);
         }
         
         $(document).ready(function() {
