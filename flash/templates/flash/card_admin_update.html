@@ -1,0 +1,38 @@
+{% extends 'flash/base.html' %}
+{%block content%}
+<div class="form">
+    <form>
+        <h1>Edit Flashcard</h1>
+        <div class="form-group">
+            <label for="question">Old Question: {{flashcard.question}}</label>
+            <input type="text" class="form-control" id="question" placeholder="Enter new question" value="{{flashcard.question}}">
+        </div>
+        <div class="form-group">
+            <label for="answer">Old Answer: {{flashcard.answer}} </label>
+            <input type="text" class="form-control" id="answer" placeholder="Enter new answer" value="{{flashcard.answer}}">
+        </div>
+        <div class="container-c">
+            <div class="center mt-3">
+                <button class="btn btn-primary" onClick="update();">Update</button>
+            </div>
+        </div>
+    </form>
+    <script>
+        function update(){
+            console.log("Updating card with question: " + $('#question').val() + " and answer: " + $('#answer').val())
+            $.ajax({
+                type: "POST",
+                url: '{% url 'card-admin-update' 0 %}'.replace('0', '{{flashcard.id}}'),
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'question': $('#question').val(),
+                    'answer': $('#answer').val()
+                },
+                success: function () {
+                    window.location.href = '{% url 'card-admin' %}';
+                }
+            });
+        }
+    </script>
+</div><br><br>
+{%endblock%}

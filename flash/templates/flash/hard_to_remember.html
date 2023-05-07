@@ -1,6 +1,9 @@
 {% extends 'flash/base.html' %}
 {% block content %}
     {% comment %} iterate through flashcards_json {% endcomment %}
+    {% if flashcards_json|length == 0 %}
+        <h1>No flashcards here yet</h1>
+    {% endif %}
     {% for card in flashcards_json %}
         <div class="d-flex justify-content-center align-items-center mt-3">
             <div class="card d-flex justify-content-center align-items-center">

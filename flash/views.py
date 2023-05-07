@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Flashcard
 from django.core import serializers
 from django.http import JsonResponse
@@ -89,20 +89,25 @@ def card_admin_delete(request):
         return JsonResponse({'flashcard_id': flashcard_id})
     return JsonResponse({'flashcard_id': -1})
 
-def card_admin_update(request):
+def card_admin_update(request, pk):
     # update
+    flashcard = Flashcard.objects.get(id=pk)
+    flashcards = Flashcard.objects.filter(user_id=request.user)
     if request.method == 'POST':
-        flashcard_id = request.POST['flashcard_id']
         question = request.POST['question']
         answer = request.POST['answer']
-        flashcard = Flashcard.objects.get(id=flashcard_id)
         flashcard.question = question
         flashcard.answer = answer
         flashcard.save()
-        return JsonResponse({'flashcard_id': flashcard_id})
-    return JsonResponse({'flashcard_id': -1})
+        return render(request, 'flash/card_admin.html', {'flashcards': flashcards})
+    else:
+        context = {
+            'flashcard': flashcard
+        }
+        return render(request, 'flash/card_admin_update.html', context)
 
 def admin_tool(request):
+    # tool to clear all cooldowns and hard_to_remember values
     all_flashcards = Flashcard.objects.all()
     for x in all_flashcards:
         x.time_cooldown = 0
