@@ -3,7 +3,7 @@ from .models import Flashcard
 from django.core import serializers
 from django.http import JsonResponse
 
-timespan = [0, 5, 25, 120, 600, 3600, 18000, 86400, 432000, 2160000, 10520000, -1]
+timespan = [0, 2, 3, 4, 5, 3600, 18000, 86400, 432000, 2160000, 10520000, -1]
 
 
 def home(request):

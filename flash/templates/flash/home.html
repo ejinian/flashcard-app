@@ -28,9 +28,20 @@
 
 
     <script>
-        let timespan = [0, 5, 25, 120, 600, 3600, 18000, 86400, 432000, 2160000, 10520000, -1];
+        let timespan = [0, 2, 3, 4, 5, 3600, 18000, 86400, 432000, 2160000, 10520000, -1];
         var flashcards = JSON.parse('{{ flashcards_json|safe }}');
         var index = 0;
+        startTimer();
+
+        function showTemporaryMessage(message) {
+            let showDone = document.getElementsByClassName('invis')[0];
+            showDone.style.display = 'block';
+            showDone.innerHTML = message;
+            let showCard = document.getElementById('r1');
+            showCard.style.visibility = 'hidden';
+            let showBtns = document.getElementById('r2');
+            showBtns.style.visibility = 'hidden';
+        }
 
         function done(){
             let showDone = document.getElementsByClassName('invis')[0];
@@ -40,6 +51,18 @@
             let showBtns = document.getElementById('r2');
             showBtns.style.visibility = 'hidden';
             return;
+        }
+
+        function startTimer() {
+            setInterval(() => {
+                for (let i = 0; i < flashcards.length; i++) {
+                    const card = flashcards[i];
+                    if (card.fields.time_cooldown > 0) {
+                        console.log("Decrementing cooldown for card " + card.pk)
+                        card.fields.time_cooldown--;
+                    }
+                }
+            }, 1000);
         }
 
         function handleNext(correct) {
@@ -75,22 +98,32 @@
             } else {
                 flashcards[index].fields.time_cooldown = 5;
             }
-            // we are incrementing the index because we want to show the next card
-            // it would be better to auto sort the flashcards by time_cooldown each time
-            console.log(flashcards);
             flashcards.sort(function(a, b) {
                 return a.fields.time_cooldown - b.fields.time_cooldown;
             });
 
             index = 0;
-            renderFlashcard();
+            let timeOut = flashcards[index].fields.time_cooldown;
+            console.log("timeOut: " + timeOut);
+            setTimeout(function() {
+                isTimerRunning = false;
+                renderFlashcard();
+            }, timeOut * 1000);
+            showTemporaryMessage("You are temporarily done; please come back later to review more words.")
         }
         
         function renderFlashcard() {
+            console.log("rendering flashcard");
             if (flashcards[index] === undefined){
                 done();
                 return;
             }
+            let showDone = document.getElementsByClassName('invis')[0];
+            showDone.style.display = 'none';
+            let showCard = document.getElementById('r1');
+            showCard.style.visibility = 'visible';
+            let showBtns = document.getElementById('r2');
+            showBtns.style.visibility = 'visible';
             var c = flashcards[index].fields;
             $('#question').text(c.question);
             $('#answer').text(c.answer);
