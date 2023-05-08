@@ -1,17 +1,17 @@
 {% extends 'flash/base.html' %}
 {% block content %}
     {% csrf_token %}
-    <h1 class="invis">You have no more words to review; you are permanently done!</h1>
+    <h1 class="invis"></h1>
     <div id="r1" class="d-flex justify-content-center align-items-center" style="height: 40vh;">
         <div class="card d-flex justify-content-center align-items-center">
             <div class="card-inner " style="align-items:center">
                 <div class="card-front">
                     <p>Word</p>
-                    <h1 id="question">Question</h1>
+                    <h2 id="question">Question</h2>
                 </div>
                 <div class="card-back">
                     <p>Definition</p>
-                    <h1 id="answer">Answer</h1>
+                    <h2 id="answer">Answer</h2>
                 </div>
             </div>
             <button class="btn btn-primary mb-2" style="text-align:center;max-width:200px;">Show definition</button>
@@ -29,23 +29,26 @@
         // hashmap to map bin to timespan in seconds
         let timespan = {
             '0': 0,
-            '1': 1,
-            '2': 1,
-            '3': 1,
-            '4': 1,
-            '5': 1,
-            '6': 1,
-            '7': 1,
-            '8': 1,
-            '9': 1,
-            '10': 1,
-            '11': 99999999,
+            '1': 5,
+            '2': 25,
+            '3': 120,
+            '4': 600,
+            '5': 3600,
+            '6': 18000,
+            '7': 86400,
+            '8': 432000,
+            '9': 2160000,
+            '10': 10520000,
+            '11': 99999999
         }
+        const temp = "You are temporarily done; please come back later to review more words.";
+        const perm = "You have no more words to review; you are permanently done!";
         var flashcards = JSON.parse('{{ flashcards_json|safe }}');
         var index = 0;
+        let renderedAfterTimer = false;
         startTimer();
 
-        function showTemporaryMessage(message) {
+        function showMessage(message) {
             let showDone = document.getElementsByClassName('invis')[0];
             showDone.style.display = 'block';
             showDone.innerHTML = message;
@@ -53,16 +56,6 @@
             showCard.style.visibility = 'hidden';
             let showBtns = document.getElementById('r2');
             showBtns.style.visibility = 'hidden';
-        }
-
-        function done(){
-            let showDone = document.getElementsByClassName('invis')[0];
-            showDone.style.display = 'block';
-            let showCard = document.getElementById('r1');
-            showCard.style.visibility = 'hidden';
-            let showBtns = document.getElementById('r2');
-            showBtns.style.visibility = 'hidden';
-            return;
         }
 
         function startTimer() {
@@ -74,6 +67,11 @@
                     if (card.fields.time_cooldown > 0) {
                         console.log("Decrementing cooldown for card " + card.pk + " seconds: " + card.fields.time_cooldown)
                         card.fields.time_cooldown--;
+                    }else{
+                        if (renderedAfterTimer === false){
+                            renderFlashcard();
+                        }
+                        renderedAfterTimer = true;
                     }
                 }
             }, 1000);
@@ -81,11 +79,10 @@
 
         function handleNext(correct) {
             if (flashcards === undefined){
-                done();
+                showMessage(perm);
                 return;
             }
             var c = flashcards[index].fields;
-            console.log(c);
             $.ajax({
                 type: 'POST',
                 url: '{% url 'flash-card-home' %}',
@@ -108,23 +105,13 @@
             if (correct === true) {
                 let nextBinIndex = parseInt(c.current_bin) + 1;
                 let nextBin = nextBinIndex.toString();
-                if (timespan[nextBin] === undefined) {
-                    nextBin = c.current_bin;
-                }
-                if (nextBin === "11"){
-                    // checking to exclude a card from being rendered if it is in the last bin
-                    location.reload();
-                }
                 flashcards[index].fields.time_cooldown = timespan[nextBin];
                 flashcards[index].fields.current_bin = nextBin;
                 console.log("card id " + flashcards[index].pk + " new bin " + nextBin);
             } else {
                 console.log("answered incorrectly")
                 c.hard_to_remember++;
-                if (c.hard_to_remember === 10){
-                    location.reload();
-                }
-                flashcards[index].fields.time_cooldown = 1;
+                flashcards[index].fields.time_cooldown = 5;
                 flashcards[index].fields.current_bin = "1";
             }
 
@@ -136,23 +123,29 @@
 
             index = 0;
             let timeOut = flashcards[index].fields.time_cooldown;
+            if (flashcards[index].fields.current_bin === "11" || flashcards[index].fields.hard_to_remember === 10) {
+                showMessage(perm);
+                return;
+            }
             setTimeout(function() {
-                isTimerRunning = false;
                 renderFlashcard();
             }, timeOut * 1000);
-            showTemporaryMessage("You are temporarily done; please come back later to review more words.")
+            showMessage(temp)
         }
         
         function renderFlashcard() {
             console.log("rendering flashcard");
             if (flashcards[index] === undefined){
-                done();
+                showMessage(perm);
                 return;
             }
             // at this point, we are only rendering the lowest cooldown card, or the temporary message if that card also has a cooldown
             console.log(flashcards[index].fields)
-            if (flashcards[index].fields.time_cooldown > 0) {
-                showTemporaryMessage("You are temporarily done; please come back later to review more words.")
+            if (flashcards[index].fields.time_cooldown > 0 && flashcards[index].fields.current_bin !== "11") {
+                showMessage(temp);
+            }else if (flashcards[index].fields.current_bin === "11" || flashcards[index].fields.hard_to_remember === 10){
+                showMessage(perm);
+                return;
             }else{
                 let showDone = document.getElementsByClassName('invis')[0];
                 showDone.style.display = 'none';

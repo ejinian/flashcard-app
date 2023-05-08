@@ -30,15 +30,15 @@
                     <div class="card-inner " style="align-items:center">
                         <div class="card-front">
                             <p>Question</p>
-                            <h1 id="question">{{ card.question}}</h1>
+                            <h2 id="question">{{ card.question}}</h2>
                         </div>
                         <div class="card-back">
                             <p>Definition</p>
-                            <h1 id="answer">{{ card.answer }}</h1>
+                            <h2 id="answer">{{ card.answer }}</h2>
                         </div>
                     </div>
                     <p>Current Bin: {{card.current_bin}}</p>
-                    <p>Cooldown: {{ card.time_cooldown }}</p>
+                    <p>Cooldown: {{ card.time_cooldown }} seconds</p>
                     <p>Answered Incorrectly: {{ card.hard_to_remember }}</p>
                     <button class="btn btn-primary mb-2" style="text-align:center;max-width:200px;">Show definition</button>
                 </div>

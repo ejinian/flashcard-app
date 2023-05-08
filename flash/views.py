@@ -7,17 +7,17 @@ from datetime import datetime, timezone
 timespan_old = [0, 5, 25, 120, 600, 3600, 18000, 86400, 432000, 2160000, 10520000, -1]
 timespan = {
     '0': 0,
-    '1': 1,
-    '2': 1,
-    '3': 1,
-    '4': 1,
-    '5': 1,
-    '6': 1,
-    '7': 1,
-    '8': 1,
-    '9': 1,
-    '10': 1,
-    '11': 99999999,
+    '1': 5,
+    '2': 25,
+    '3': 120,
+    '4': 600,
+    '5': 3600,
+    '6': 18000,
+    '7': 86400,
+    '8': 432000,
+    '9': 2160000,
+    '10': 10520000,
+    '11': 99999999
 }
 
 def updateTimes(user):
@@ -53,11 +53,11 @@ def home(request):
             flashcard.current_bin = nextBin
         else:
             flashcard.hard_to_remember += 1
-            flashcard.time_cooldown = 1
+            flashcard.time_cooldown = 5
             flashcard.current_bin = '1'
         flashcard.last_bin_change = datetime.now(timezone.utc)
         flashcard.save()
-        print(f'Flashcard_id: {flashcard_id}' + f' Has new cooldown: {flashcard.time_cooldown}')
+        print(f'Flashcard_id: {flashcard_id}' + f' Has new bin: {flashcard.current_bin}')
         sendBack = {
             'flashcard_id': flashcard_id,
             'time_cooldown': flashcard.time_cooldown,
@@ -131,7 +131,9 @@ def card_admin_update(request, pk):
 def admin_tool(request):
     # nice tool to clear all cooldowns and hard_to_remember values
     # -------not needed in production-------
-    all_flashcards = Flashcard.objects.all()
+    if not request.user.is_authenticated:
+        return redirect('login')
+    all_flashcards = Flashcard.objects.filter(user_id=request.user)
     for x in all_flashcards:
         x.time_cooldown = 0
         x.hard_to_remember = 0
