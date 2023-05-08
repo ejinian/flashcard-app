@@ -4,7 +4,6 @@ from django.core import serializers
 from django.http import JsonResponse
 from datetime import datetime, timezone
 
-timespan_old = [0, 5, 25, 120, 600, 3600, 18000, 86400, 432000, 2160000, 10520000, -1]
 timespan = {
     '0': 0,
     '1': 5,
@@ -21,7 +20,10 @@ timespan = {
 }
 
 def updateTimes(user):
+    # this function allows for synchronization of time_cooldown between the db and frontend
+    # creates the illusion that the timer of each flashcard is ticking on the backend
     flashcards = Flashcard.objects.filter(user_id=user)
+    # keeping all time in UTC
     current_time = datetime.now(timezone.utc)
     print(f'Current time: {current_time}')
     for flashcard in flashcards:
@@ -42,10 +44,9 @@ def home(request):
     if request.method == 'POST':
         flashcard_id = request.POST['id']
         correct = request.POST['correct']
-        time_cooldown = request.POST['time_cooldown']
         current_bin = request.POST['current_bin']
         flashcard = Flashcard.objects.get(id=flashcard_id)
-        if correct == 'true':
+        if correct == 'true': # ajax sending strings
             nextBin = str(int(current_bin) + 1)
             if flashcard.current_bin == '11':
                 nextBin = '11'
@@ -66,8 +67,10 @@ def home(request):
         }
         return JsonResponse(sendBack)
     
+    # get all flashcards that are not in the last bin or hard to remember==10
     flashcards = Flashcard.objects.filter(user_id=request.user)\
         .exclude(current_bin='11').exclude(hard_to_remember=10).order_by('time_cooldown')
+    # serializing so that it is easier to parse on the frontend
     flashcards_json = serializers.serialize('json', flashcards)
     context = {
         'flashcards_json': flashcards_json
@@ -129,15 +132,16 @@ def card_admin_update(request, pk):
         return render(request, 'flash/card_admin_update.html', {'flashcard': flashcard})
 
 def admin_tool(request):
-    # nice tool to clear all cooldowns and hard_to_remember values
+    # nice tool to clear all cooldowns, bin, and hard_to_remember values
     # -------not needed in production-------
     if not request.user.is_authenticated:
         return redirect('login')
-    all_flashcards = Flashcard.objects.filter(user_id=request.user)
+    all_flashcards = Flashcard.objects.all()
+    flashcards = Flashcard.objects.filter(user_id=request.user)
     for x in all_flashcards:
         x.time_cooldown = 0
         x.hard_to_remember = 0
         x.current_bin = '0'
         x.save()
-    flashcards_json = serializers.serialize('json', all_flashcards)
-    return render(request, 'flash/home.html', {'flashcards_json': flashcards_json})
+    flashcards_json = serializers.serialize('json', flashcards)
+    return render(request, 'flash/home.html', {'flashcards_json': flashcards})

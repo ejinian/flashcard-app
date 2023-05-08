@@ -45,10 +45,13 @@
         const perm = "You have no more words to review; you are permanently done!";
         var flashcards = JSON.parse('{{ flashcards_json|safe }}');
         var index = 0;
+        // renderedAfterTimer ensures that if you leave the page and come back, once the timer ticks down it will render the card
+        // only once though, otherwise it will render the card every second
         let renderedAfterTimer = false;
         startTimer();
 
         function showMessage(message) {
+            // getting the h1 element and displaying the message
             let showDone = document.getElementsByClassName('invis')[0];
             showDone.style.display = 'block';
             showDone.innerHTML = message;
@@ -82,6 +85,7 @@
                 showMessage(perm);
                 return;
             }
+            // sending info about a card
             var c = flashcards[index].fields;
             $.ajax({
                 type: 'POST',
@@ -90,7 +94,6 @@
                     csrfmiddlewaretoken: '{{ csrf_token }}',
                     id: flashcards[index].pk,
                     correct: correct,
-                    time_cooldown: c.time_cooldown,
                     current_bin: c.current_bin,
                 },
                 success: function(response) {
@@ -123,13 +126,28 @@
 
             index = 0;
             let timeOut = flashcards[index].fields.time_cooldown;
-            if (flashcards[index].fields.current_bin === "11" || flashcards[index].fields.hard_to_remember === 10) {
+            if (flashcards[index].fields.current_bin === "11") {
                 showMessage(perm);
                 return;
             }
+
+            if (flashcards[index].fields.hard_to_remember === 10){
+                // check if there are any other cards with a cooldown
+                for (let i = 1; i < flashcards.length; i++) {
+                    const card = flashcards[i];
+                    if (card.fields.time_cooldown > 0) {
+                        showMessage(temp);
+                        return;
+                    }
+                }
+                showMessage(perm);
+                return;
+            }
+
             setTimeout(function() {
                 renderFlashcard();
             }, timeOut * 1000);
+
             showMessage(temp)
         }
         
@@ -147,6 +165,7 @@
                 showMessage(perm);
                 return;
             }else{
+                // undo the showMessage function
                 let showDone = document.getElementsByClassName('invis')[0];
                 showDone.style.display = 'none';
                 let showCard = document.getElementById('r1');
@@ -161,9 +180,9 @@
         
         $(document).ready(function() {
             renderFlashcard();
-            $('#showbtns').show();
+            $('#showbtns').hide();
             $('.card').click(function() {
-                //$('#showbtns').fadeToggle();
+                $('#showbtns').fadeToggle();
                 $(this).toggleClass('card-flipped');
             });
         });
