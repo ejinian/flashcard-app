@@ -25,7 +25,7 @@ SECRET_KEY = 'mv-bwro-hl9d3xxh14ng^iio^&&c!2-778h+86a04155b+kj+o'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
