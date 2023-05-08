@@ -11,23 +11,23 @@ IP: http://52.53.151.224:8000/
 5. Go to http://localhost:8000/
 6. (Optional) Run tests: `python3 manage.py test`
 
-### Objective: 1-10 difficulty
-- [x] Flashcards must be displayed one at a time, with a word on one side and the definition on the other. Difficulty: 1
-- [x] Users must be able to flip the flashcard to see the definition. Difficulty: 1
-- [x] Users must be able to mark whether or not they knew the answer. Difficulty: 1
-- [x] Each card will go up a level if the user knew the answer, and back to first level if they didn't. Difficulty: 3
-- [x] If a card has a picked-wrong lifetime of 10, it will be removed from the deck. Difficulty: 6
-- [x] If a card has been picked right 11 times, it will be removed from the deck. Difficulty: 6
-- [x] Each card must have a timer that is constantly counting down depending on its level. The higher the level the higher the timer. Difficulty: 9
-- [x] If the timer is positive for all cards, display a temporary message. If all cards are removed from deck then display permanent message. Difficulty: 7
-- [x] User registration and login. Difficulty: 2
-- [x] Flashcard CRUD. Difficulty: 3
-- [x] Admin interface per user. Difficulty: 2
+### Objective:
+- [x] Flashcards must be displayed one at a time, with a word on one side and the definition on the other.
+- [x] Users must be able to flip the flashcard to see the definition.
+- [x] Users must be able to mark whether or not they knew the answer.
+- [x] Each card will go up a level if the user knew the answer, and back to first level if they didn't.
+- [x] If a card has a picked-wrong lifetime of 10, it will be removed from the deck.
+- [x] If a card has been picked right 11 times, it will be removed from the deck.
+- [x] Each card must have a timer that is constantly counting down depending on its level. The higher the level the higher the timer.
+- [x] If the timer is positive for all cards, display a temporary message. If all cards are removed from deck then display permanent message.
+- [x] User registration and login.
+- [x] Flashcard CRUD.
+- [x] Admin interface per user.
 
 ### Extra Features: 1-10 difficulty
-- [x] Flashcard interaction all on the home page. Difficulty: 2
-- [x] Flashcard refresher tool that updates all flashcard attributes back to 0. Difficulty: 1
-- [x] Django test file that tests Flashcard and User models. Difficulty: 2
+- [x] Flashcard interaction all on the home page.
+- [x] Flashcard refresher tool that updates all flashcard attributes back to 0.
+- [x] Django test file that tests Flashcard and User models.
 
 ## Design
 ### DB Schema
