@@ -5,13 +5,13 @@ IP: http://52.53.151.224:8000/
 
 ## How to run
 1. Install python3 and pip3
-2. Install Django: `pip3 install django`
+2. Install Django: `pip3 install Django==3.1.4`
 3. Clone repo
 4. Run server: `python3 manage.py runserver`
 5. Go to http://localhost:8000/
 6. (Optional) Run tests: `python3 manage.py test`
 
-### Objective:
+### Requirements:
 - [x] Flashcards must be displayed one at a time, with a word on one side and the definition on the other.
 - [x] Users must be able to flip the flashcard to see the definition.
 - [x] Users must be able to mark whether or not they knew the answer.
@@ -31,7 +31,7 @@ IP: http://52.53.151.224:8000/
 
 ## Design
 ### DB Schema
-I used Django's built in User model for ease of use. This allowed me me to utilize Django's login and logout auth views. Each user has their own admin page, which is where they will control their own cards. I created a Flashcard model that has a reference to the User. The Flashcard table tracks card's word, definition, level, last level change, timer(in seconds), and how many times it was picked wrong. For this design, I needed timer, level, and last level change rows because it was the only way I could figure out how to dynamically track time of each card without having to create another table.
+I used Django's built in User model for ease of use. This allowed me me to utilize Django's login and logout auth views. Each user has their own admin page, which is where they will control their own cards. This means that Flashcards are in a many-to-one relationship to Users. I created a Flashcard model that has a reference to the User. The Flashcard table tracks card's word, definition, level, last level change, timer(in seconds), and how many times it was picked wrong. For this design, I needed timer, level, and last level change rows because it was the only way I could figure out how to dynamically track time of each card without having to create another table.
 
 ### Views
 The updateTimes function allows for time to be updated for each card upon page load by subtracting a card's last bin change from right now(datetime object). home and admin_view both call updateTimes so that the time appears to be counting down dynamically.
