@@ -24,7 +24,7 @@ IP: http://52.53.151.224:8000/
 - [x] Flashcard CRUD.
 - [x] Admin interface per user.
 
-### Extra Features: 1-10 difficulty
+### Extra Features:
 - [x] Flashcard interaction all on the home page.
 - [x] Flashcard refresher tool that updates all flashcard attributes back to 0.
 - [x] Django test file that tests Flashcard and User models.
