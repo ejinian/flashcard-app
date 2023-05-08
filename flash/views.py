@@ -144,4 +144,4 @@ def admin_tool(request):
         x.current_bin = '0'
         x.save()
     flashcards_json = serializers.serialize('json', flashcards)
-    return render(request, 'flash/home.html', {'flashcards_json': flashcards})
+    return render(request, 'flash/home.html', {'flashcards_json': flashcards_json})

@@ -181,6 +181,10 @@
         $(document).ready(function() {
             renderFlashcard();
             $('#showbtns').hide();
+            $('#showbtns').click(function() {
+                $('#showbtns').fadeToggle();
+                $('.card').toggleClass('card-flipped');
+            });
             $('.card').click(function() {
                 $('#showbtns').fadeToggle();
                 $(this).toggleClass('card-flipped');

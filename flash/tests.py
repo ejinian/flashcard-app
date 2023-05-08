@@ -1,10 +1,8 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from .models import Flashcard
-# import any python api libraries here
 import requests
 
-# Create your tests here.
 word1 = "ocean"
 word2 = "mountain"
 word3 = "forest"
