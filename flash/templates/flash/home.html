@@ -3,18 +3,18 @@
     {% csrf_token %}
     <h1 class="invis"></h1>
     <div id="r1" class="d-flex justify-content-center align-items-center" style="height: 40vh;">
-        <div class="card d-flex justify-content-center align-items-center">
-            <div class="card-inner " style="align-items:center">
-                <div class="card-front">
+        <div class="flip-card d-flex justify-content-center align-items-center">
+            <div class="flip-card-inner" style="align-items:center">
+                <div class="flip-card-front">
                     <p>Word</p>
                     <h2 id="question">Question</h2>
+                    <button class="btn btn-primary mb-2 definition-btn">Show definition</button>
                 </div>
-                <div class="card-back">
+                <div class="flip-card-back">
                     <p>Definition</p>
                     <h2 id="answer">Answer</h2>
                 </div>
             </div>
-            <button class="btn btn-primary mb-2" style="text-align:center;max-width:200px;">Show definition</button>
         </div>
     </div>
     <div id="r2" class="container-c">
@@ -181,13 +181,13 @@
         $(document).ready(function() {
             renderFlashcard();
             $('#showbtns').hide();
-            $('#showbtns').click(function() {
+            $('.flip-card').click(function() {
+                $(this).find('.flip-card-inner').toggleClass('flipped');
                 $('#showbtns').fadeToggle();
-                $('.card').toggleClass('card-flipped');
             });
-            $('.card').click(function() {
-                $('#showbtns').fadeToggle();
-                $(this).toggleClass('card-flipped');
+            $('#showbtns').click(function() {
+                $(this).hide();
+                $('.flip-card-inner').toggleClass('flipped');
             });
         });
     </script>

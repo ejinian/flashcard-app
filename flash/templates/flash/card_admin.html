@@ -27,21 +27,21 @@
     <div style="text-align: center;">        
         {% for card in flashcards %}
             <div style="display: inline-block !important;">
-                <div class="card d-flex justify-content-center align-items-center">
-                    <div class="card-inner " style="align-items:center">
-                        <div class="card-front">
+                <div class="flip-card d-flex justify-content-center align-items-center">
+                    <div class="flip-card-inner " style="align-items:center">
+                        <div class="flip-card-front">
                             <p>Word</p>
                             <h2 id="question">{{ card.question}}</h2>
+                            <button class="btn btn-primary mb-2 definition-btn">Show definition</button>
+                            <p>Current Bin: {{card.current_bin}}</p>
+                            <p>Cooldown: {{ card.time_cooldown }} seconds</p>
+                            <p>Answered Incorrectly: {{ card.hard_to_remember }}</p>
                         </div>
-                        <div class="card-back">
+                        <div class="flip-card-back">
                             <p>Definition</p>
                             <h2 id="answer">{{ card.answer }}</h2>
                         </div>
                     </div>
-                    <p>Current Bin: {{card.current_bin}}</p>
-                    <p>Cooldown: {{ card.time_cooldown }} seconds</p>
-                    <p>Answered Incorrectly: {{ card.hard_to_remember }}</p>
-                    <button class="btn btn-primary mb-2" style="text-align:center;max-width:200px;">Show definition</button>
                 </div>
                 <button class="btn btn-success mt-2 mb-2" onClick="update({{card.pk}});" style="text-align:center;max-width:200px;">Update</button>
                 <button class="btn btn-danger mb-2 mt-2" onClick="del({{card.pk}});">Delete</button>
@@ -50,8 +50,9 @@
     </div>    
     <script>
         $(document).ready(function() {
-            $('.card').click(function() {
-                $(this).toggleClass('card-flipped');
+            $('.flip-card').click(function() {
+                $(this).find('.flip-card-inner').toggleClass('flipped');
+                $('#showbtns').fadeToggle();
             });
         });
         function del(pk){
