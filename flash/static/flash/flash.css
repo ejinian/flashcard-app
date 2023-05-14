@@ -45,20 +45,20 @@ p {
   scrollbar-width: none;
 }
 
-.card-back::-webkit-scrollbar {
-  display: none;
-}
-
-.card-front::-webkit-scrollbar {
-  display: none;
-}
-
 .card-back {
   transform: rotateY(180deg);
 }
 
 .card-flipped .card-inner {
   transform: rotateY(180deg);
+}
+
+.card-back::-webkit-scrollbar {
+  display: none;
+}
+
+.card-front::-webkit-scrollbar {
+  display: none;
 }
 
 .invis{

@@ -136,9 +136,8 @@ def admin_tool(request):
     # -------not needed in production-------
     if not request.user.is_authenticated:
         return redirect('login')
-    all_flashcards = Flashcard.objects.all()
     flashcards = Flashcard.objects.filter(user_id=request.user)
-    for x in all_flashcards:
+    for x in flashcards:
         x.time_cooldown = 0
         x.hard_to_remember = 0
         x.current_bin = '0'

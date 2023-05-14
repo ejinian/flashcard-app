@@ -12,7 +12,7 @@ IP: http://52.53.151.224:8000/
 6. (Optional) Run tests: `python3 manage.py test`
 
 ## User Testing Tools
-Refresh cards will set ALL flashcard levels, timers, and wrong counters back to 0. Any user has access to this.
+Refresh cards will set a user's flashcard levels, timers, and wrong counters back to 0. Any user has access to this.
 ![User Tools](tutorial_imgs/refresh_cards.png)
 
 ### Requirements:
