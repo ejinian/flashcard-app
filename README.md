@@ -1,7 +1,7 @@
 # Flashcard App Documentation
 ## Made with Django
 
-IP: http://52.53.151.224:8000/
+Time to code - 10 hours total
 
 ## How to run
 1. Install python3 and pip3
